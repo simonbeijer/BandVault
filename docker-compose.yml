@@ -1,0 +1,32 @@
+services:
+  band-vault:
+    container_name: next-app 
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - DATABASE_URL=postgresql://simon:S1m0n@postgres:5432/band-vault-db
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    depends_on:
+      - postgres
+    command: ["npm", "run", "dev"]
+
+  postgres:
+    image: postgres:16
+    container_name: next-app-postgress
+    restart: always
+    environment:
+      POSTGRES_USER: simon
+      POSTGRES_PASSWORD: S1m0n
+      POSTGRES_DB: band-vault-db
+    ports:
+      - "5432:5432"
+    volumes:
+      - next_app_postgres_data:/var/lib/postgresql/data
+
+volumes:
+  next_app_postgres_data:
