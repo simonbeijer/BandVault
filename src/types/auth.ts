@@ -75,3 +75,25 @@ export interface AuthState {
 // ============================================================================
 // ERROR TYPES
 // ============================================================================
+
+// ============================================================================
+// isJWTPayload
+// ============================================================================
+export const isJWTPayload = (obj: unknown): obj is JWTPayload => {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'email' in obj &&
+    'name' in obj &&
+    'role' in obj &&
+    'exp' in obj &&
+    'iat' in obj &&
+    typeof (obj as JWTPayload).id === 'string' &&
+    typeof (obj as JWTPayload).email === 'string' &&
+    typeof (obj as JWTPayload).name === 'string' &&
+    typeof (obj as JWTPayload).role === 'string' &&
+    typeof (obj as JWTPayload).exp === 'number' &&
+    typeof (obj as JWTPayload).iat === 'number'
+  );
+};
