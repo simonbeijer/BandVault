@@ -70,45 +70,10 @@ export async function GET(request: NextRequest): Promise<NextResponse<AuthVerifi
 // UPDATE USER PROFILE ENDPOINT (Future Enhancement)
 // ============================================================================
 
-export async function PUT(request: NextRequest): Promise<NextResponse> {
-  // This endpoint could be implemented in the future for user profile updates
-  return NextResponse.json(
-    {
-      message: "User profile updates not yet implemented",
-      timestamp: new Date().toISOString()
-    },
-    { status: 501 } // Not Implemented
-  );
-}
-
-// ============================================================================
-// METHOD NOT ALLOWED HANDLERS
-// ============================================================================
-
-export async function POST(): Promise<NextResponse> {
-  return NextResponse.json(
-    { 
-      message: "Method not allowed. Use GET to verify authentication.",
-      timestamp: new Date().toISOString()
-    },
-    { status: 405 }
-  );
-}
-
-export async function DELETE(): Promise<NextResponse> {
-  return NextResponse.json(
-    { 
-      message: "Method not allowed. Use GET to verify authentication.",
-      timestamp: new Date().toISOString()
-    },
-    { status: 405 }
-  );
-}
-
 export async function PATCH(): Promise<NextResponse> {
   return NextResponse.json(
     { 
-      message: "Method not allowed. Use GET to verify authentication or PUT to update profile.",
+      message: "Method not allowed. Use GET to verify authentication.",
       timestamp: new Date().toISOString()
     },
     { status: 405 }
