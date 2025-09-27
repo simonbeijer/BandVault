@@ -84,7 +84,7 @@ export const createToken = async (user: User): Promise<string> => {
  */
 export const verifyAuth = async (token: string): Promise<JWTPayload> => {
   if (!token || typeof token !== 'string') {
-    throw new AuthError("Missing or invalid token", { code: 'MISSING_TOKEN' });
+    throw new AuthError("Missing or invalid token");
   }
 
   try {
@@ -95,25 +95,17 @@ export const verifyAuth = async (token: string): Promise<JWTPayload> => {
 
     // Type guard to ensure payload matches our expected structure
     if (!isJWTPayload(payload)) {
-      throw new AuthError("Invalid token payload structure", { 
-        code: 'INVALID_CREDENTIALS' 
-      });
+      throw new AuthError("Invalid token payload structure");
     }
 
     return payload;
   } catch (error) {
     if (error instanceof jose.errors.JWTExpired) {
-      throw new AuthError("Token has expired", { 
-        code: 'TOKEN_EXPIRED',
-        statusCode: 401
-      });
+      throw new AuthError("Token has expired", { cause: error });
     }
     
     if (error instanceof jose.errors.JWTInvalid) {
-      throw new AuthError("Invalid token signature", { 
-        code: 'INVALID_CREDENTIALS',
-        statusCode: 401
-      });
+      throw new AuthError("Invalid token signature", { cause: error });
     }
 
     if (error instanceof AuthError) {
@@ -122,41 +114,20 @@ export const verifyAuth = async (token: string): Promise<JWTPayload> => {
 
     throw new AuthError(
       `Token verification failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      { 
-        code: 'UNAUTHORIZED',
-        statusCode: 401,
-        cause: error
-      }
+      { cause: error }
     );
   }
 };
 
 class AuthError extends Error {
-  public code: 'INVALID_CREDENTIALS' | 'TOKEN_EXPIRED' | 'MISSING_TOKEN' | 'UNAUTHORIZED';
-  public statusCode?: number;
-
-  constructor(
-    message: string, 
-    options: { 
-      code?: 'INVALID_CREDENTIALS' | 'TOKEN_EXPIRED' | 'MISSING_TOKEN' | 'UNAUTHORIZED';
-      statusCode?: number;
-      cause?: unknown;
-    } = {}
-  ) {
+  constructor(message: string, options?: { cause?: unknown }) {
     super(message);
     this.name = 'AuthError';
-    this.code = options.code || 'UNAUTHORIZED';
     
-    if (options.statusCode !== undefined) {
-      this.statusCode = options.statusCode;
-    }
-    
-    // Set cause if provided (for modern environments)
-    if (options.cause && 'cause' in Error.prototype) {
+    if (options?.cause && 'cause' in Error.prototype) {
       (this as any).cause = options.cause;
     }
     
-    // Maintain proper stack trace
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, AuthError);
     }
