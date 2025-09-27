@@ -95,7 +95,7 @@ const TermsModal = ({
           <Button
             variant={canProceed ? "primary" : "secondary"}
             size="lg"
-            callBack={handleAcceptTerms}
+            onClick={handleAcceptTerms}
             disabled={!canProceed}
             className="min-w-[200px]"
           >

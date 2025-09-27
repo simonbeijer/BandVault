@@ -21,7 +21,7 @@ export default function Error({ error, reset }: ErrorProps) {
         We apologize for the inconvenience. Please try again later.
       </p>
       <button
-        onClick={() => reset()} // Attempt to recover by trying to re-render the segment
+        onClick={() => reset()}
         className="text-blue-500 hover:underline mt-4"
       >
         Try again
