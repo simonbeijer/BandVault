@@ -5,6 +5,6 @@ export const devLog = (...args: any[]) => {
     const timeStamp = new Date().toISOString();
     const stack = new Error().stack?.split("\n")[2]?.trim();
 
-    console.log(`[${timeStamp}][${stack}]`, ...args);
+    console.log(`⏱️ \n [${timeStamp}] \n 🗂️ \n [${stack}]\n`, ...args);
   }
 };
