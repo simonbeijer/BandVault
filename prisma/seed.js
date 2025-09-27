@@ -1,10 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcrypt');
-
+const password = process.env.PASSWORD;
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await bcrypt.hash('Password123', 10);
+  const passwordHash = await bcrypt.hash(password, 10);
   await prisma.user.deleteMany();
   await prisma.user.createMany({
     data: [
