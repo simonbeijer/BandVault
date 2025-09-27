@@ -5,7 +5,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react';
 // A simplified Button component tailored for its actual usage in the project.
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  callBack?: () => void;
+  onClick?: () => void;
   variant?: 'primary' | 'secondary';
   size?: 'default' | 'lg';
   children?: ReactNode; // Use children for text content
@@ -13,7 +13,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 export default function Button({
-  callBack,
+  onClick,
   variant = 'primary',
   size = 'default',
   className = '',
@@ -42,7 +42,7 @@ export default function Button({
 
   return (
     <button
-      onClick={callBack}
+      onClick={onClick}
       type={type}
       disabled={disabled}
       className={combinedClasses}

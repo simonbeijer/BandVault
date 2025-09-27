@@ -94,7 +94,7 @@ export default function Login() {
                 label="Password"
               />
               {error && (
-                <p className="text-red-500 text-sm text-center">
+                <p data-testid="error-message" className="text-red-500 text-sm text-center">
                   Login failed. Please check your email and password.
                 </p>
               )}
