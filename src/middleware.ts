@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAuth } from '@/lib/auth';
+import { devLog } from './lib/logger';
 
 // Middleware configuration: specify which paths to run on.
 export const config = {
@@ -16,36 +17,34 @@ export const config = {
 };
 
 // List of paths that do not require authentication.
-const PUBLIC_PATHS = ['/login'];
+const PUBLIC_PATHS = ['/', '/login'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // 1. Check if the current path is a public path.
+  const token = request.cookies.get('token')?.value;
+
+  devLog(pathname, token ? 'TOKEN' : 'NO TOKEN ')
+
   const isPublicPath = PUBLIC_PATHS.includes(pathname);
-  if (isPublicPath) {
-    // Allow access to public paths without authentication.
+  if (!token && isPublicPath) {
     return NextResponse.next();
   }
 
-  // 2. Get the authentication token from the cookies.
-  const token = request.cookies.get('token')?.value;
-
-  // 3. If there is no token, redirect to the login page.
   if (!token) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // 4. Verify the token.
   try {
     await verifyAuth(token);
-    // If the token is valid, allow the request to proceed.
+    if(isPublicPath) {
+      return NextResponse.redirect(new URL('/dashboard', request.url));
+    } 
     return NextResponse.next();
+    
   } catch (err) {
-    // If token verification fails, redirect to the login page.
     console.error('Middleware Auth Error:', err);
     const response = NextResponse.redirect(new URL('/login', request.url));
-    // Clear the invalid token from the user's browser.
     response.cookies.delete('token');
     return response;
   }
