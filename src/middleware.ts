@@ -11,8 +11,9 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
+     * - Static assets in public folder
      */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.png$|.*\\.jpg$|.*\\.jpeg$|.*\\.gif$|.*\\.svg$).*)',
   ],
 };
 
@@ -21,12 +22,12 @@ const PUBLIC_PATHS = ['/', '/login'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
   const token = request.cookies.get('token')?.value;
-
-  devLog(pathname, token ? 'TOKEN' : 'NO TOKEN ')
+  
+  devLog(pathname, token ? 'TOKEN' : 'NO TOKEN');
 
   const isPublicPath = PUBLIC_PATHS.includes(pathname);
+
   if (!token && isPublicPath) {
     return NextResponse.next();
   }
@@ -37,7 +38,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     await verifyAuth(token);
-    if(isPublicPath) {
+    if (isPublicPath) {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     } 
     return NextResponse.next();

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image"
 
 export default function Home() {
   return (
@@ -8,6 +9,14 @@ export default function Home() {
           <h1 className="text-4xl font-bold text-foreground">
             Welcome to Band Vault
           </h1>
+          <Image
+  src="/band-vault-icon.png"
+  alt="image of a vault filled with music"
+  width={64}
+  height={64}
+  unoptimized
+/>
+
           <p className="text-lg text-grey max-w-md">
             BandVault help you and you band to save and organize demo recordings. Each song gets its own space with notes, lyrics, and chat, making it easy to track ideas from practice to finished songs.
           </p>
