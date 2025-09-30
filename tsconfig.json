@@ -19,7 +19,7 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/components/*": ["./src/app/components/*"],
-      "@/components/widget/*": ["./src/app/components/widget/*"],
+      "@/components/dashboard/*": ["./src/app/components/dashboard/*"],
       "@/context/*": ["./src/app/context/*"],
       "@/lib/*": ["./src/lib/*"],
       "@/types/*": ["./src/types/*"],
