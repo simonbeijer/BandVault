@@ -6,7 +6,7 @@ interface InputFieldProps {
   value: string;
   onChange: (value: string) => void;
   placeholder: string;
-  label: string;
+  label?: string;
   error?: boolean;
 }
 
@@ -26,9 +26,11 @@ export default function InputField({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-foreground mb-2">
-        {label}
-      </label>
+      {label && (
+        <label className="block text-sm font-medium text-foreground mb-2">
+          {label}
+        </label>
+      )}
       <input
         type={type}
         name={name}
