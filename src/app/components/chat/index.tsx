@@ -40,16 +40,15 @@ export default function Chat({ songId }: ChatProps) {
 
 
     const fetchMessages = async () => {
-
         let URL = '/api/messages'
 
         if(songId) {
-            URL = `/api/messages?songId${songId}`
+            URL = `/api/messages?songId=${songId}`
         }
 
         try {
 
-            const res = await fetch('/api/messages', { method: 'GET', credentials: 'include' })
+            const res = await fetch(URL, { method: 'GET', credentials: 'include' })
 
             if (res.ok) {
 
