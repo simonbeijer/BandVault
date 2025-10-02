@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Link from 'next/link'
 
 interface Songs {
     id: string
@@ -33,7 +34,9 @@ const Songs = () => {
                     <div>No Songs</div>
                 ) : (songs?.map((song) => (
                     <li key={song.id} className={`cursor-pointer bg-background rounded-lg shadow-sm border border-grey p-2 `}>
-                        {song.title}
+                        <Link href={`/song/${song.id}`}>
+                            {song.title}
+                        </Link>
                     </li>)
                 ))
 

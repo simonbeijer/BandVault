@@ -40,23 +40,46 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Fetch songs for user's band
-    const songs = await prisma.song.findMany({
-      where: {
-        bandId: user.bandId,
-      },
-      orderBy: {
-        createdAt: 'desc', // Newest first
-      },
-      select: {
-        id: true,
-        title: true,
-        createdAt: true,
-        audioUrl: true,
-      },
-    });
+    const { searchParams } = new URL(request.url);
+    const songId = searchParams.get('id');
 
-    return NextResponse.json(songs);
+    if (songId) {
+      const song = await prisma.song.findUnique({
+        where: {
+          id: songId,
+          bandId: user.bandId,
+        },
+        select: {
+          id: true,
+          title: true,
+          createdAt: true,
+          audioUrl: true,
+        },
+      });
+
+      if (!song) {
+        return NextResponse.json({ error: 'Song not found' }, { status: 404 });
+      }
+
+      return NextResponse.json(song);
+    } else {
+      const songs = await prisma.song.findMany({
+        where: {
+          bandId: user.bandId,
+        },
+        orderBy: {
+          createdAt: 'desc', // Newest first
+        },
+        select: {
+          id: true,
+          title: true,
+          createdAt: true,
+          audioUrl: true,
+        },
+      });
+
+      return NextResponse.json(songs);
+    }
   } catch (error) {
     console.error('Error fetching songs:', error);
     return NextResponse.json(
