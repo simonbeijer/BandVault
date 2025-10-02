@@ -4,6 +4,8 @@ import { useUserContext } from "@/context/userContext";
 import TermsModal from "@/components/termsModal";
 import Sidebar from "@/app/components/dashboard/sidebar";
 import UserInfo from "@/app/components/dashboard/userInfo";
+import AddSong from "@/components/dashboard/addSong";
+import Songs from "@/components/dashboard/songs";
 import Chat from "@/app/components/chat/index"
 export default function Dashboard() {
   const [showTermsModal, setShowTermsModal] = useState<boolean>(false);
@@ -35,6 +37,16 @@ export default function Dashboard() {
       selected: displayPage === 2,
       label: 'User',
       onClick: () => selectedPage(2)
+    },
+    {
+      selected: displayPage === 3,
+      label: 'Add Song',
+      onClick: () => selectedPage(3)
+    },
+    {
+      selected: displayPage === 4,
+      label: 'Songs',
+      onClick: () => selectedPage(4)
     }
   ]
 
@@ -57,7 +69,12 @@ export default function Dashboard() {
         {displayPage === 2 && (
           <UserInfo name={user?.name} email={user?.email}></UserInfo>
         )}
-
+        {displayPage === 3 && (
+          <AddSong></AddSong>
+        )}
+        {displayPage === 4 && (
+          <Songs></Songs>
+        )}
       </div>
     </div>
   );
