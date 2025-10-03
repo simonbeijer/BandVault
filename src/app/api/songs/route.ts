@@ -54,6 +54,7 @@ export async function GET(request: NextRequest) {
           title: true,
           createdAt: true,
           audioUrl: true,
+          lyrics: true,
         },
       });
 
@@ -166,4 +167,52 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function PUT(request: NextRequest) {
+    const token = getTokenFromRequest(request);
+    if (!token) {
+        return NextResponse.json(
+            { error: 'Unauthorized - No token provided' },
+            { status: 401 }
+        );
+    }
+
+    try {
+        const payload = await verifyAuth(token);
+        const user = await prisma.user.findUnique({
+            where: { id: payload.id },
+        });
+
+        if (!user) {
+            return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const songId = searchParams.get('id');
+
+        if (!songId) {
+            return NextResponse.json({ error: 'Song ID is required' }, { status: 400 });
+        }
+
+        const { lyrics } = await request.json();
+
+        const song = await prisma.song.update({
+            where: {
+                id: songId,
+                bandId: user.bandId,
+            },
+            data: {
+                lyrics,
+            },
+        });
+
+        return NextResponse.json({ message: 'Lyrics updated successfully', song });
+    } catch (error) {
+        console.error('Error updating lyrics:', error);
+        return NextResponse.json(
+            { error: 'Failed to update lyrics' },
+            { status: 500 }
+        );
+    }
 }
