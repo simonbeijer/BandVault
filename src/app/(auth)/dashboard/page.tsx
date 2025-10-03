@@ -33,11 +33,11 @@ export default function Dashboard() {
       label: 'Chat',
       onClick: () => selectedPage(1)
     },
-    {
-      selected: displayPage === 2,
-      label: 'User',
-      onClick: () => selectedPage(2)
-    },
+    // {
+    //   selected: displayPage === 2,
+    //   label: 'User',
+    //   onClick: () => selectedPage(2)
+    // },
     {
       selected: displayPage === 3,
       label: 'Add Song',
