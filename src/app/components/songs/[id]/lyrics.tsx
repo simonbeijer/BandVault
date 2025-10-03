@@ -3,6 +3,8 @@
 
 import { useState, useEffect } from "react";
 
+import Spinner from "../../spinner";
+
 interface LyricsProps {
     songId: string;
 }
@@ -10,6 +12,7 @@ interface LyricsProps {
 export default function Lyrics({ songId }: LyricsProps) {
     const [lyrics, setLyrics] = useState("");
     const [isEditing, setIsEditing] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchLyrics();
@@ -28,6 +31,8 @@ export default function Lyrics({ songId }: LyricsProps) {
             }
         } catch (error) {
             console.error('Error fetching lyrics:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -57,7 +62,9 @@ export default function Lyrics({ songId }: LyricsProps) {
                     {isEditing ? "Cancel" : "Edit"}
                 </button>
             </div>
-            {isEditing ? (
+            {loading ? (
+                <Spinner />
+            ) : isEditing ? (
                 <div>
                     <textarea
                         className="w-full h-64 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground border-grey"

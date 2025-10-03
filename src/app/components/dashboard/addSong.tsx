@@ -4,6 +4,8 @@ import InputField from '@/components/inputField';
 import Button from '@/components/button';
 import { useState, type ChangeEvent } from 'react';
 
+import Spinner from '../spinner';
+
 const AddSong = () => {
   const [title, setTitle] = useState<string>('');
   const [titleError, setTitleError] = useState<boolean>(false);
@@ -146,7 +148,7 @@ const AddSong = () => {
 
       <Button
         onClick={addSong}
-        text={loading ? 'Adding...' : 'Add Song'}
+        text={loading ? <Spinner /> : 'Add Song'}
         disabled={loading}
       />
     </div>

@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { devLog } from '@/lib/logger'
 
+import Spinner from '../spinner';
+
 interface Message {
     id: string;
     text: string;
@@ -20,6 +22,7 @@ interface ChatProps {
 export default function Chat({ songId }: ChatProps) {
     const [newMessage, setNewMessage] = useState<string>('')
     const [messages, setMessages] = useState<Message[]>([])
+    const [loading, setLoading] = useState(true)
     const messagesEndRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
@@ -63,6 +66,8 @@ export default function Chat({ songId }: ChatProps) {
 
         } catch (error) {
             console.error('Error fetching messages:', error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -93,7 +98,9 @@ export default function Chat({ songId }: ChatProps) {
     return (
         <div className="bg-background flex flex-col h-2/4 rounded-lg border border-grey p-6 gap-2 text-foreground">
             <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-lg border border-grey">
-                {messages.length === 0 ? (
+                {loading ? (
+                    <Spinner />
+                ) : messages.length === 0 ? (
                     <div>
                         <p>NO messages</p>
                     </div>

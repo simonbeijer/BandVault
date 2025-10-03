@@ -5,6 +5,7 @@ import { useUserContext } from "@/context/userContext";
 import Sidebar from "@/app/components/dashboard/sidebar";
 import Chat from "@/app/components/chat";
 import Lyrics from "./lyrics";
+import Spinner from "../../spinner";
 
 interface Song {
     id: string;
@@ -22,6 +23,7 @@ export default function SongClient({ songId }: SongClientProps) {
     const { user } = useUserContext();
     const [displayPage, setDisplayPage] = useState(1);
     const [song, setSong] = useState<Song | null>(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         fetchSong();
@@ -40,7 +42,7 @@ export default function SongClient({ songId }: SongClientProps) {
         } catch (error) {
             console.error('Error fetching song:', error);
         } finally {
-            //   setLoading(false);
+            setLoading(false);
         }
     };
 
@@ -65,7 +67,7 @@ export default function SongClient({ songId }: SongClientProps) {
                     <h1 className="text-3xl font-bold text-foreground mb-2">{song?.title}</h1>
                     <p className="text-grey">Here's your song overview with separate chat, lyrics and chords.</p>
                 </div>
-                <div className="bg-background rounded-lg shadow-sm border border-grey p-6">
+                {loading ? <Spinner /> : <div className="bg-background rounded-lg shadow-sm border border-grey p-6">
 
                     {song && (
                         <audio controls className="w-full">
@@ -73,7 +75,7 @@ export default function SongClient({ songId }: SongClientProps) {
                             Your browser does not support the audio element.
                         </audio>
                     )}
-                </div>
+                </div>}
                 <Sidebar title="Options" items={sideBarItems} />
                 {displayPage === 1 && songId && <Chat songId={songId} />}
                 {displayPage === 2 && <Lyrics songId={songId} />}
