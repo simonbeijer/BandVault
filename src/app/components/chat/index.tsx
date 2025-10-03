@@ -75,7 +75,7 @@ export default function Chat({ songId }: ChatProps) {
             const res = await fetch('/api/messages', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({
                     text: newMessage.trim(),
-                    songId: null
+                    songId: songId
                 })
             })
 
