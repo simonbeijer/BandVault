@@ -32,7 +32,7 @@ export default function Chat({ songId }: ChatProps) {
         }, 5000);
 
         return () => clearInterval(interval);
-    }, [])
+    }, [songId])
 
 
 
@@ -45,7 +45,7 @@ export default function Chat({ songId }: ChatProps) {
     const fetchMessages = async () => {
         let URL = '/api/messages'
 
-        if(songId) {
+        if (songId) {
             URL = `/api/messages?songId=${songId}`
         }
 
@@ -96,36 +96,24 @@ export default function Chat({ songId }: ChatProps) {
     }
 
     return (
-        <div className="bg-background flex flex-col h-2/4 rounded-lg border border-grey p-6 gap-2 text-foreground">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-lg border border-grey">
-                {loading ? (
-                    <Spinner />
-                ) : messages.length === 0 ? (
-                    <div>
-                        <p>NO messages</p>
-                    </div>
-                ) : (
-                    messages.map((message) => (
-                        <div key={message.id} className="flex flex-col">
-                            <div className="flex items-baseline gap-2">
-                                <span className="font-medium text-sm">{message.user.name}</span>
-                                <span className="text-xs text-gray-500">
-                                    {new Date(message.createdAt).toLocaleTimeString()}
-                                </span>
-                            </div>
-                            <p className=" mt-1">{message.text}</p>
-
-                        </div>
-                    )
-                    )
-                )}
+        <div className="bg-background flex flex-col h-full rounded-lg border border-grey p-4 gap-2 text-foreground">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-lg border border-grey min-h-0">
                 <div ref={messagesEndRef} className="h-1" />
             </div>
-            <div className="flex gap-2 ">
-
-                <input type="text" value={newMessage} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewMessage(e.target.value)} className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground border-grey" />
-                <button onClick={sendMessage} className="px-4 py-2 border rounded-lg bg-primary text-foreground">TEST</button>
+            <div className="flex gap-2 flex-shrink-0">
+                <input
+                    type="text"
+                    value={newMessage}
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground border-grey"
+                />
+                <button
+                    onClick={sendMessage}
+                    className="px-4 py-2 border rounded-lg bg-primary text-foreground"
+                >
+                    Send
+                </button>
             </div>
         </div>
-    )
+    );
 }

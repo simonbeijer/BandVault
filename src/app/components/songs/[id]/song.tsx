@@ -61,24 +61,31 @@ export default function SongClient({ songId }: SongClientProps) {
     ];
 
     return (
-        <div className="h-[calc(100vh-3rem)] bg-background flex flex-col overflow-hidden">
-            <div className="flex flex-col flex-1 w-full max-w-4xl mx-auto p-4 gap-2">
-                <div className="mb-4">
+        <div className="h-[calc(100vh-3rem)] bg-background flex flex-col">
+            <div className="flex flex-col w-full max-w-4xl mx-auto p-4 gap-4 h-full">
+                <div className="flex-shrink-0">
                     <h1 className="text-3xl font-bold text-foreground mb-2">{song?.title}</h1>
                     <p className="text-grey">Here's your song overview with separate chat, lyrics and chords.</p>
                 </div>
-                {loading ? <Spinner /> : <div className="bg-background rounded-lg shadow-sm border border-grey p-6">
-
-                    {song && (
-                        <audio controls className="w-full">
-                            <source src={`/api/songs/${song.audioUrl}`} type="audio/mpeg" />
-                            Your browser does not support the audio element.
-                        </audio>
-                    )}
-                </div>}
-                <Sidebar title="Options" items={sideBarItems} />
-                {displayPage === 1 && songId && <Chat songId={songId} />}
-                {displayPage === 2 && <Lyrics songId={songId} />}
+                {loading ? (
+                    <Spinner />
+                ) : (
+                    <div className="bg-background rounded-lg shadow-sm border border-grey p-6 flex-shrink-0">
+                        {song && (
+                            <audio controls className="w-full">
+                                <source src={`/api/songs/${song.audioUrl}`} type="audio/mpeg" />
+                                Your browser does not support the audio element.
+                            </audio>
+                        )}
+                    </div>
+                )}
+                <div className="flex-shrink-0">
+                    <Sidebar title="Options" items={sideBarItems} />
+                </div>
+                <div className="flex-1 min-h-0 overflow-hidden">
+                    {displayPage === 1 && songId && <Chat songId={songId} />}
+                    {displayPage === 2 && <Lyrics songId={songId} />}
+                </div>
             </div>
         </div>
     );

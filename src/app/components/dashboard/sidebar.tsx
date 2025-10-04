@@ -23,7 +23,7 @@ const Sidebar = ({
 }: SidebarProps) => {
 
     return (
-        <aside className={`w-full bg-background rounded-lg shadow-sm border border-grey p-6`}>
+        <div className={`w-full bg-background rounded-lg shadow-sm border border-grey p-6`}>
             {/* <h2 className='p-2 text-center'>{title}</h2> */}
             <ul className={`flex flex-row gap-2`}>
                 {items?.map((item, index) => (
@@ -34,7 +34,7 @@ const Sidebar = ({
                 ))}
 
             </ul>
-        </aside>
+        </div>
     );
 };
 
