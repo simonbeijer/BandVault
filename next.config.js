@@ -31,6 +31,8 @@ const nextConfig = {
               "base-uri 'self'", // Restrict base URI
               "form-action 'self'", // Restrict form submissions
               "upgrade-insecure-requests", // Upgrade HTTP to HTTPS
+              "media-src 'self' https://res.cloudinary.com", // For song hosting
+                "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com", // For vercel hosting
             ].join('; ')
           },
           {
