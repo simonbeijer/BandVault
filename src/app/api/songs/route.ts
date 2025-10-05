@@ -1,8 +1,22 @@
 import { NextResponse, NextRequest } from "next/server";
-import { writeFile } from 'fs/promises';
-import { join } from 'path';
+import { v2 as cloudinary } from 'cloudinary';
 import prisma from '@/lib/prisma';
 import { verifyAuth } from '@/lib/auth';
+
+// Configure Cloudinary
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+const apiKey = process.env.CLOUDINARY_API_KEY;
+const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+if (!cloudName || !apiKey || !apiSecret) {
+  throw new Error('Missing Cloudinary credentials. Check your .env file.');
+}
+
+cloudinary.config({
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
+});
 
 // ============================================================================
 // HELPER FUNCTIONS
@@ -15,6 +29,36 @@ function getTokenFromRequest(request: NextRequest): string | null {
   }
   const token = request.cookies.get('token')?.value;
   return token || null;
+}
+
+// Valid audio/video MIME types
+const VALID_AUDIO_TYPES = [
+  'audio/mpeg',
+  'audio/mp3',
+  'audio/wav',
+  'audio/wave',
+  'audio/x-wav',
+  'audio/aac',
+  'audio/m4a',
+  'audio/x-m4a',
+  'audio/mp4',
+  'audio/ogg',
+  'audio/flac',
+  'audio/webm',
+  'video/mp4',        // Voice memos
+  'video/quicktime',  // .mov files
+  'video/x-m4a',
+];
+
+function isValidAudioFile(file: File): boolean {
+  // Check MIME type
+  if (VALID_AUDIO_TYPES.includes(file.type)) {
+    return true;
+  }
+  
+  // Check file extension as fallback
+  const validExtensions = /\.(mp3|wav|m4a|aac|ogg|flac|webm|mp4|mov)$/i;
+  return validExtensions.test(file.name);
 }
 
 // ============================================================================
@@ -44,17 +88,11 @@ export async function GET(request: NextRequest) {
     const songId = searchParams.get('id');
 
     if (songId) {
-      const song = await prisma.song.findUnique({
+      // Fetch single song
+      const song = await prisma.song.findFirst({
         where: {
           id: songId,
           bandId: user.bandId,
-        },
-        select: {
-          id: true,
-          title: true,
-          createdAt: true,
-          audioUrl: true,
-          lyrics: true,
         },
       });
 
@@ -63,24 +101,25 @@ export async function GET(request: NextRequest) {
       }
 
       return NextResponse.json(song);
-    } else {
-      const songs = await prisma.song.findMany({
-        where: {
-          bandId: user.bandId,
-        },
-        orderBy: {
-          createdAt: 'desc', // Newest first
-        },
-        select: {
-          id: true,
-          title: true,
-          createdAt: true,
-          audioUrl: true,
-        },
-      });
-
-      return NextResponse.json(songs);
     }
+
+    // Fetch all songs for user's band
+    const songs = await prisma.song.findMany({
+      where: {
+        bandId: user.bandId,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+        audioUrl: true,
+      },
+    });
+
+    return NextResponse.json(songs);
   } catch (error) {
     console.error('Error fetching songs:', error);
     return NextResponse.json(
@@ -127,37 +166,65 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Audio file is required' }, { status: 400 });
     }
 
-    // Validate file type
-    if (!file.type.startsWith('audio/')) {
-      return NextResponse.json({ error: 'File must be an audio file' }, { status: 400 });
+    // Validate file type (accepts audio and video files for voice memos)
+    if (!isValidAudioFile(file)) {
+      return NextResponse.json({ 
+        error: `Invalid file type: ${file.type}. Please upload an audio file (MP3, WAV, M4A, AAC, etc.)` 
+      }, { status: 400 });
     }
 
-    // Generate unique filename: timestamp-originalname
-    const timestamp = Date.now();
-    const filename = `${timestamp}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    
-    // Save file to disk
+    // Validate file size (50MB max)
+    const maxSize = 50 * 1024 * 1024;
+    if (file.size > maxSize) {
+      return NextResponse.json({ 
+        error: 'File too large. Maximum size is 50MB' 
+      }, { status: 400 });
+    }
+
+    console.log('Uploading file:', {
+      name: file.name,
+      type: file.type,
+      size: `${(file.size / 1024 / 1024).toFixed(2)} MB`
+    });
+
+    // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    
-    const uploadDir = join(process.cwd(), 'uploads');
-    const filepath = join(uploadDir, filename);
-    
-    await writeFile(filepath, buffer);
-    console.log('File saved to:', filepath);
 
-    // Store filename in database (not full path)
+    // Upload to Cloudinary
+    const uploadResult: any = await new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          resource_type: 'video', // Cloudinary uses 'video' for all audio files
+          folder: 'band-vault',
+          // Let Cloudinary auto-detect the format instead of forcing mp3
+        },
+        (error, result) => {
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            reject(error);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+      uploadStream.end(buffer);
+    });
+
+    console.log('Uploaded to Cloudinary:', uploadResult.secure_url);
+
+    // Store song in database with Cloudinary URL
     const song = await prisma.song.create({
       data: {
         title: title.trim(),
         bandId: user.bandId,
-        audioUrl: filename, // Just the filename, not full path
+        audioUrl: uploadResult.secure_url,
       },
     });
 
-    return NextResponse.json({ 
-      message: 'Song created successfully', 
-      song 
+    return NextResponse.json({
+      message: 'Song created successfully',
+      song
     }, { status: 201 });
 
   } catch (error) {
@@ -167,52 +234,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
-
-export async function PUT(request: NextRequest) {
-    const token = getTokenFromRequest(request);
-    if (!token) {
-        return NextResponse.json(
-            { error: 'Unauthorized - No token provided' },
-            { status: 401 }
-        );
-    }
-
-    try {
-        const payload = await verifyAuth(token);
-        const user = await prisma.user.findUnique({
-            where: { id: payload.id },
-        });
-
-        if (!user) {
-            return NextResponse.json({ error: 'User not found' }, { status: 404 });
-        }
-
-        const { searchParams } = new URL(request.url);
-        const songId = searchParams.get('id');
-
-        if (!songId) {
-            return NextResponse.json({ error: 'Song ID is required' }, { status: 400 });
-        }
-
-        const { lyrics } = await request.json();
-
-        const song = await prisma.song.update({
-            where: {
-                id: songId,
-                bandId: user.bandId,
-            },
-            data: {
-                lyrics,
-            },
-        });
-
-        return NextResponse.json({ message: 'Lyrics updated successfully', song });
-    } catch (error) {
-        console.error('Error updating lyrics:', error);
-        return NextResponse.json(
-            { error: 'Failed to update lyrics' },
-            { status: 500 }
-        );
-    }
 }
