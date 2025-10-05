@@ -20,7 +20,7 @@ export default function InputField({
   error,
 }: InputFieldProps) {
   const baseClasses =
-    "w-full px-4 py-3 border rounded-lg bg-white dark:bg-white text-black placeholder-grey focus:outline-none focus:ring-2 focus:ring-primary";
+    "w-full px-4 py-3 border rounded-lg text-black placeholder-grey focus:outline-none focus:ring-2 focus:ring-primary bg-background";
   const errorClasses = error ? "border-red-500" : "border-grey";
   const inputClasses = `${baseClasses} ${errorClasses}`.trim();
 
