@@ -39,19 +39,19 @@ export default function Dashboard() {
     //   onClick: () => selectedPage(2)
     // },
     {
+      selected: displayPage === 4,
+      label: 'Songs',
+      onClick: () => selectedPage(4)
+    },
+    {
       selected: displayPage === 3,
       label: 'Add Song',
       onClick: () => selectedPage(3)
     },
-    {
-      selected: displayPage === 4,
-      label: 'Songs',
-      onClick: () => selectedPage(4)
-    }
   ]
 
   return (
-    <div className="h-[calc(100vh-3rem)] bg-background flex flex-col overflow-hidden">
+    <div className="min-h-screen bg-background flex flex-col">
       <TermsModal isOpen={showTermsModal} onClose={closeTermsModal} showClose={false} />
 
       <div className="flex flex-col flex-1 w-full max-w-4xl mx-auto p-4 gap-2">
@@ -63,18 +63,20 @@ export default function Dashboard() {
           title="Options"
           items={sideBarItems}
         />
-        {displayPage === 1 && (
-          <Chat></Chat>
-        )}
-        {displayPage === 2 && (
-          <UserInfo name={user?.name} email={user?.email}></UserInfo>
-        )}
-        {displayPage === 3 && (
-          <AddSong></AddSong>
-        )}
-        {displayPage === 4 && (
-          <Songs></Songs>
-        )}
+        <div className="flex flex-col flex-1 overflow-visible">
+          {displayPage === 1 && (
+            <Chat></Chat>
+          )}
+          {displayPage === 2 && (
+            <UserInfo name={user?.name} email={user?.email}></UserInfo>
+          )}
+          {displayPage === 3 && (
+            <AddSong></AddSong>
+          )}
+          {displayPage === 4 && (
+            <Songs></Songs>
+          )}
+        </div>
       </div>
     </div>
   );

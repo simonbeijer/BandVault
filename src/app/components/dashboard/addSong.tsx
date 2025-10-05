@@ -3,7 +3,6 @@
 import InputField from '@/components/inputField';
 import Button from '@/components/button';
 import { useState, type ChangeEvent } from 'react';
-
 import Spinner from '../spinner';
 
 const AddSong = () => {
@@ -14,6 +13,25 @@ const AddSong = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [success, setSuccess] = useState<boolean>(false);
 
+  // Valid audio/video formats for music and voice memos
+  const VALID_AUDIO_FORMATS = [
+    'audio/mpeg',        // .mp3
+    'audio/mp3',
+    'audio/wav',         // .wav
+    'audio/wave',
+    'audio/x-wav',
+    'audio/aac',         // .aac
+    'audio/m4a',         // .m4a
+    'audio/x-m4a',
+    'audio/mp4',         // .m4a sometimes
+    'audio/ogg',         // .ogg
+    'audio/flac',        // .flac
+    'audio/webm',        // .webm
+    'video/mp4',         // Voice memos (m4a/mp4) ⭐
+    'video/quicktime',   // .mov files
+    'video/x-m4a',
+  ];
+
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     
@@ -23,14 +41,18 @@ const AddSong = () => {
       return;
     }
 
-    if (!file.type.startsWith('audio/')) {
-      setFileError('Please select an audio file');
+    // Check if it's a valid audio/video file
+    const isValidFormat = VALID_AUDIO_FORMATS.includes(file.type) ||
+                         file.name.match(/\.(mp3|wav|m4a|aac|ogg|flac|webm|mp4|mov)$/i);
+
+    if (!isValidFormat) {
+      setFileError(`Invalid file type: ${file.type}. Please select an audio file (MP3, WAV, M4A, AAC, etc.)`);
       return;
     }
 
-    const maxSize = 10 * 1024 * 1024;
+    const maxSize = 50 * 1024 * 1024; // Increased to 50MB for longer recordings
     if (file.size > maxSize) {
-      setFileError('File too large. Maximum size is 5MB');
+      setFileError('File too large. Maximum size is 50MB');
       return;
     }
 
@@ -38,7 +60,6 @@ const AddSong = () => {
   };
 
   const addSong = async () => {
-
     setTitleError(false);
     setFileError('');
     setSuccess(false);
@@ -80,8 +101,6 @@ const AddSong = () => {
         if (fileInput) {
           fileInput.value = '';
         }
-
-        // TODO: Trigger song list refresh or redirect
         
       } else {
         const error = await res.json();
@@ -111,7 +130,7 @@ const AddSong = () => {
         type="text"
         value={title}
         onChange={setTitle}
-        placeholder="Title"
+        placeholder="Enter song title"
         label="Song title"
       />
       {titleError && (
@@ -120,17 +139,26 @@ const AddSong = () => {
 
       <div className="flex flex-col gap-2">
         <label htmlFor="file-upload" className="cursor-pointer">
-          <div className="flex items-center gap-2 p-4 border border-grey rounded-lg">
-            <span className="text-2xl">📂</span>
-            <span className="text-foreground">
-              {musicFile ? musicFile.name : 'Select audio file (max 5MB)'}
+          <div className="flex items-center gap-2 p-4 border border-grey rounded-lg hover:border-primary transition-colors">
+            <span className="text-2xl">
+              {musicFile ? '🎵' : '📂'}
             </span>
+            <div className="flex-1">
+              <span className="text-foreground block">
+                {musicFile ? musicFile.name : 'Select audio file'}
+              </span>
+              {!musicFile && (
+                <span className="text-sm text-grey">
+                  Supports: MP3, WAV, M4A, AAC, Voice Memos (max 50MB)
+                </span>
+              )}
+            </div>
           </div>
         </label>
         <input
           id="file-upload"
           type="file"
-          accept="audio/*"
+          accept="audio/*,video/mp4,video/quicktime,.m4a,.mp3,.wav,.aac,.ogg,.flac"
           onChange={handleFileChange}
           style={{ display: 'none' }}
         />
@@ -140,17 +168,20 @@ const AddSong = () => {
         )}
         
         {musicFile && (
-          <p className="text-sm text-gray-600">
-            Size: {(musicFile.size / 1024 / 1024).toFixed(2)} MB
-          </p>
+          <div className="text-sm text-grey space-y-1">
+            <p>Size: {(musicFile.size / 1024 / 1024).toFixed(2)} MB</p>
+            <p>Type: {musicFile.type || 'Unknown'}</p>
+          </div>
         )}
       </div>
 
       <Button
         onClick={addSong}
-        text={loading ? <Spinner /> : 'Add Song'}
+        text={loading ? 'Uploading...' : 'Add Song'}
         disabled={loading}
-      />
+      >
+        {loading && <Spinner />}
+      </Button>
     </div>
   );
 };

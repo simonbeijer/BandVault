@@ -26,25 +26,26 @@ export default function SongClient({ songId }: SongClientProps) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchSong = async () => {
+            try {
+                const res = await fetch(`/api/songs?id=${songId}`, {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    setSong(data);
+                }
+            } catch (error) {
+                console.error('Error fetching song:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
         fetchSong();
     }, [songId]);
-    const fetchSong = async () => {
-        try {
-            const res = await fetch(`/api/songs?id=${songId}`, {
-                method: 'GET',
-                credentials: 'include'
-            });
 
-            if (res.ok) {
-                const data = await res.json();
-                setSong(data);
-            }
-        } catch (error) {
-            console.error('Error fetching song:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
 
     const sideBarItems = [
@@ -65,15 +66,15 @@ export default function SongClient({ songId }: SongClientProps) {
             <div className="flex flex-col w-full max-w-4xl mx-auto p-4 gap-4 h-full">
                 <div className="flex-shrink-0">
                     <h1 className="text-3xl font-bold text-foreground mb-2">{song?.title}</h1>
-                    <p className="text-grey">Here's your song overview with separate chat, lyrics and chords.</p>
+                    <p className="text-grey">Here&apos;s your song overview with separate chat, lyrics and chords.</p>
                 </div>
                 {loading ? (
                     <Spinner />
                 ) : (
-                    <div className="bg-background rounded-lg shadow-sm border border-grey p-6 flex-shrink-0">
+                    <div className="bg-background rounded-lg shadow-sm border border-grey p-2 flex-shrink-0">
                         {song && (
                             <audio controls className="w-full">
-                                <source src={`/api/songs/${song.audioUrl}`} type="audio/mpeg" />
+                                <source src={song.audioUrl === null ? "" : song.audioUrl} type="audio/mpeg" />
                                 Your browser does not support the audio element.
                             </audio>
                         )}

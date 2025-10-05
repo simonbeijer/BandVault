@@ -7,14 +7,21 @@ interface ConditionalFooterProps {
   className?: string;
 }
 
-const ConditionalFooter = ({ 
-  hiddenPaths = ["/login", "/dashboard", "/song"],
+const ConditionalFooter = ({
+  hiddenPaths = ["/login", "/dashboard", "/song/*"],
   className = ''
 }: ConditionalFooterProps) => {
   const pathname = usePathname();
-  
-  // Hide footer on specified paths
-  if (hiddenPaths.includes(pathname)) {
+
+  const shouldHide = hiddenPaths.some(path => {
+    if (path.endsWith('/*')) {
+      const basePath = path.slice(0, -2); // Remove /*
+      return pathname.startsWith(basePath + '/');
+    }
+    return pathname === path;
+  });
+
+  if (shouldHide) {
     return null;
   }
 
