@@ -120,7 +120,7 @@ export default function Chat({ songId }: ChatProps) {
     };
 
     return (
-        <div className="bg-background flex flex-col h-[600px] rounded-lg border border-grey p-4 gap-4 text-foreground">
+        <div className="bg-background flex flex-col h-full rounded-lg border border-grey p-4 gap-4 text-foreground">
             {/* Messages container with fixed height and scroll */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-lg border border-grey bg-background">
                 {loading ? (

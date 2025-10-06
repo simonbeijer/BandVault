@@ -49,35 +49,26 @@ export default function Dashboard() {
       onClick: () => selectedPage(3)
     },
   ]
+return (
+  <div className="h-screen bg-background flex flex-col"> {/* Changed from min-h-screen */}
+    <TermsModal isOpen={showTermsModal} onClose={closeTermsModal} showClose={false} />
 
-  return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <TermsModal isOpen={showTermsModal} onClose={closeTermsModal} showClose={false} />
-
-      <div className="flex flex-col flex-1 w-full max-w-4xl mx-auto p-4 gap-2">
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back!</h1>
-          <p className="text-grey">Here&apos;s your user information and dashboard overview.</p>
-        </div>
-        <Sidebar
-          title="Options"
-          items={sideBarItems}
-        />
-        <div className="flex flex-col flex-1 overflow-visible">
-          {displayPage === 1 && (
-            <Chat></Chat>
-          )}
-          {displayPage === 2 && (
-            <UserInfo name={user?.name} email={user?.email}></UserInfo>
-          )}
-          {displayPage === 3 && (
-            <AddSong></AddSong>
-          )}
-          {displayPage === 4 && (
-            <Songs></Songs>
-          )}
-        </div>
+    <div className="flex flex-col flex-1 w-full max-w-4xl mx-auto p-4 gap-2 min-h-0"> {/* Added min-h-0 */}
+      <div className="flex-shrink-0"> {/* Added flex-shrink-0 to header */}
+        <h1 className="text-3xl font-bold text-foreground mb-2">Welcome back!</h1>
+        <p className="text-grey">Here&apos;s your user information and dashboard overview.</p>
+      </div>
+      <Sidebar
+        title="Options"
+        items={sideBarItems}
+      />
+      <div className="flex flex-col flex-1 min-h-0 overflow-hidden"> {/* Key change here */}
+        {displayPage === 1 && <Chat />}
+        {displayPage === 2 && <UserInfo name={user?.name} email={user?.email} />}
+        {displayPage === 3 && <AddSong />}
+        {displayPage === 4 && <Songs />}
       </div>
     </div>
-  );
+  </div>
+);
 }
