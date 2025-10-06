@@ -55,7 +55,7 @@ function isValidAudioFile(file: File): boolean {
   if (VALID_AUDIO_TYPES.includes(file.type)) {
     return true;
   }
-  
+
   // Check file extension as fallback
   const validExtensions = /\.(mp3|wav|m4a|aac|ogg|flac|webm|mp4|mov)$/i;
   return validExtensions.test(file.name);
@@ -168,16 +168,16 @@ export async function POST(request: NextRequest) {
 
     // Validate file type (accepts audio and video files for voice memos)
     if (!isValidAudioFile(file)) {
-      return NextResponse.json({ 
-        error: `Invalid file type: ${file.type}. Please upload an audio file (MP3, WAV, M4A, AAC, etc.)` 
+      return NextResponse.json({
+        error: `Invalid file type: ${file.type}. Please upload an audio file (MP3, WAV, M4A, AAC, etc.)`
       }, { status: 400 });
     }
 
     // Validate file size (50MB max)
     const maxSize = 50 * 1024 * 1024;
     if (file.size > maxSize) {
-      return NextResponse.json({ 
-        error: 'File too large. Maximum size is 50MB' 
+      return NextResponse.json({
+        error: 'File too large. Maximum size is 50MB'
       }, { status: 400 });
     }
 
@@ -231,6 +231,61 @@ export async function POST(request: NextRequest) {
     console.error('Error adding song:', error);
     return NextResponse.json(
       { error: 'Failed to add song' },
+      { status: 500 }
+    );
+  }
+}
+
+
+// ============================================================================
+// PUT /api/songs - Update lyrics
+// ============================================================================
+
+
+
+export async function PUT(request: NextRequest) {
+  const token = getTokenFromRequest(request);
+  if (!token) {
+    return NextResponse.json(
+      { error: 'Unauthorized - No token provided' },
+      { status: 401 }
+    );
+  }
+
+  try {
+    const payload = await verifyAuth(token);
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const songId = searchParams.get('id');
+
+    if (!songId) {
+      return NextResponse.json({ error: 'Song ID is required' }, { status: 400 });
+    }
+
+    const { lyrics } = await request.json();
+
+    const song = await prisma.song.update({
+      where: {
+        id: songId,
+        bandId: user.bandId,
+      },
+      data: {
+        lyrics,
+      },
+    });
+
+    return NextResponse.json({ message: 'Lyrics updated successfully', song });
+  } catch (error) {
+    console.error('Error updating lyrics:', error);
+    return NextResponse.json(
+      { error: 'Failed to update lyrics' },
       { status: 500 }
     );
   }
