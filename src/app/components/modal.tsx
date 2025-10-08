@@ -115,7 +115,6 @@ const Modal = ({
         onKeyDown={handleKeyDown}
         tabIndex={-1}
       >
-        {/* Header */}
         {(title || showClose) && (
           <div className="flex items-center justify-between p-6 border-b border-grey">
             {title && (
@@ -134,8 +133,6 @@ const Modal = ({
             )}
           </div>
         )}
-
-        {/* Content */}
         <div className={`p-6 ${title || showClose ? '' : 'pt-6'}`}>
           {children}
         </div>

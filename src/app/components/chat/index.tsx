@@ -37,9 +37,9 @@ export default function Chat({ songId }: ChatProps) {
             }
 
             try {
-                const res = await fetch(URL, { 
-                    method: 'GET', 
-                    credentials: 'include' 
+                const res = await fetch(URL, {
+                    method: 'GET',
+                    credentials: 'include'
                 });
 
                 if (res.ok) {
@@ -58,7 +58,7 @@ export default function Chat({ songId }: ChatProps) {
         };
 
         fetchMessages();
-        
+
         // Poll for new messages every 5 seconds
         const interval = setInterval(() => {
             fetchMessages();
@@ -121,7 +121,6 @@ export default function Chat({ songId }: ChatProps) {
 
     return (
         <div className="bg-background flex flex-col h-full rounded-lg border border-grey p-4 gap-4 text-foreground">
-            {/* Messages container with fixed height and scroll */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4 rounded-lg border border-grey bg-background">
                 {loading ? (
                     <div className="flex items-center justify-center h-full">
@@ -153,8 +152,6 @@ export default function Chat({ songId }: ChatProps) {
                     </>
                 )}
             </div>
-
-            {/* Input stays fixed at bottom */}
             <div className="flex gap-2 flex-shrink-0">
                 <input
                     type="text"

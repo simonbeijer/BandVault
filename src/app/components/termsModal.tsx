@@ -61,7 +61,6 @@ const TermsModal = ({
       closeOnBackdropClick={false}
     >
       <div className="max-w-4xl mx-auto space-y-6">
-        {/* Disclaimer Section */}
         <NoticeCard
           variant="info"
           icon={<InformationCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400" />}
@@ -78,7 +77,6 @@ const TermsModal = ({
           )}
         </NoticeCard>
 
-        {/* Consent Checkboxes */}
         <div className="space-y-4 mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border">
           <CheckboxField
             id="terms-checkbox"
@@ -90,7 +88,6 @@ const TermsModal = ({
           </CheckboxField>
         </div>
 
-        {/* Accept Button */}
         <div className="text-center pt-4">
           <Button
             variant={canProceed ? "primary" : "secondary"}

@@ -25,7 +25,7 @@ interface HeaderProps {
   customActions?: ReactNode;
 }
 
-const Header = ({ 
+const Header = ({
   title = 'Template',
   navigation = [
     { label: 'Dashboard', href: '/dashboard' }
@@ -40,7 +40,7 @@ const Header = ({
 
   const logoutUser = async (): Promise<void> => {
     try {
-      const response = await fetch("/api/auth/logout", { 
+      const response = await fetch("/api/auth/logout", {
         method: "POST",
         headers: {
           'Content-Type': 'application/json'
@@ -62,30 +62,24 @@ const Header = ({
 
   return (
     <header className={`relative flex justify-between items-center h-16 px-6 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 ${className}`.trim()}>
-      {/* Left section */}
       <div className="flex items-center">
         {children}
       </div>
-      
-      {/* Center navigation */}
       <nav className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-4">
         <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
           {title}
         </h1>
         {navigation.map((item) => (
-          <Link 
+          <Link
             key={item.href}
-            href={item.href} 
-            className={`text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors duration-200 ${
-              item.active ? 'text-primary dark:text-primary font-semibold' : ''
-            }`}
+            href={item.href}
+            className={`text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors duration-200 ${item.active ? 'text-primary dark:text-primary font-semibold' : ''
+              }`}
           >
             {item.label}
           </Link>
         ))}
       </nav>
-      
-      {/* Right section */}
       <div className="flex items-center gap-4">
         {customActions}
         {showUserDropdown && (
