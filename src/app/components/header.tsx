@@ -5,6 +5,7 @@ import { useUserContext } from "@/context/userContext";
 import Link from "next/link";
 import Dropdown from "./dropdown";
 import type { ReactNode } from 'react';
+import Image from 'next/image'
 
 interface User {
   name: string;
@@ -12,29 +13,7 @@ interface User {
   id?: string;
 }
 
-interface HeaderProps {
-  title?: string;
-  navigation?: Array<{
-    label: string;
-    href: string;
-    active?: boolean;
-  }>;
-  className?: string;
-  children?: ReactNode;
-  showUserDropdown?: boolean;
-  customActions?: ReactNode;
-}
-
-const Header = ({
-  title = 'Template',
-  navigation = [
-    { label: 'Dashboard', href: '/dashboard' }
-  ],
-  className = '',
-  children,
-  showUserDropdown = true,
-  customActions
-}: HeaderProps) => {
+const Header = () => {
   const { user, setUser } = useUserContext();
   const router = useRouter();
 
@@ -61,28 +40,34 @@ const Header = ({
   };
 
   return (
-    <header className={`relative flex justify-between items-center h-16 px-6 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 ${className}`.trim()}>
-      <div className="flex items-center">
-        {children}
+    <header className="relative flex justify-between items-center h-16 md:px-6 bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+      <div className="flex items-center"></div>
+      <div className="flex items-center justify-between w-full max-w-4xl mx-auto md:px-10">
+
+        <div className="flex items-center md:gap-2">
+          <Image
+            src="/band-vault-icon.png"
+            alt="image of a vault filled with music"
+            width={60}
+            height={60}
+          />
+          <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
+            Band Vault
+          </h1>
+        </div>
+        <nav className="flex items-center md:gap-4">
+          {user && (
+            <Link
+              href="/dashboard"
+              className="text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors duration-200"
+            >
+              Dashboard
+            </Link>
+          )}
+        </nav>
       </div>
-      <nav className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-4">
-        <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
-          {title}
-        </h1>
-        {navigation.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`text-gray-900 dark:text-white hover:text-gray-700 dark:hover:text-gray-200 font-medium transition-colors duration-200 ${item.active ? 'text-primary dark:text-primary font-semibold' : ''
-              }`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-      <div className="flex items-center gap-4">
-        {customActions}
-        {showUserDropdown && (
+      <div className="flex items-center md:gap-4">
+        {user && (
           <Dropdown logoutUser={logoutUser} user={user as User} />
         )}
       </div>
